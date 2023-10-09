@@ -3,7 +3,6 @@ import React, { useState } from "react";
 
 import CustomInput from "../../Components/CustomInput/CustomInput";
 import CustomButton from "../../Components/CustomButton/CustomButton";
-import SocialSignInButtons from "../../Components/SocialSignInButtons/SocialSignInButtons";
 
 const ForgotPasswordScreen = () => {
   const [username, setUsername] = useState("");
