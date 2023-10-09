@@ -12,7 +12,7 @@ const NewPasswordScreen = () => {
   const navigation = useNavigation();
 
   const onSignInPressed = () => {
-    navigation.navigate('SignIn')
+    navigation.navigate('SignIn');
   };
   const onSubmitPressed = () => {
     navigation.navigate('Home')
