@@ -1,11 +1,15 @@
-import { SafeAreaView, StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import Navigation from "./src/Components/navigation";
+import { Amplify } from "aws-amplify";
+import config from "./src/aws-exports";
+import { withAuthenticator } from "aws-amplify-react-native";
 
-export default function App() {
-  return (
-      <Navigation />
-  )
-}
+Amplify.configure(config);
+
+const App = () => {
+  // Auth.signOut();
+  return <Navigation />;
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -13,3 +17,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FBFC",
   },
 });
+
+
+export default App;
