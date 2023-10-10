@@ -1,10 +1,10 @@
 import {
   View,
-  Text,
   useWindowDimensions,
   Image,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 
@@ -14,19 +14,30 @@ import CustomButton from "../../Components/CustomButton/CustomButton";
 import SocialSignInButtons from "../../Components/SocialSignInButtons/SocialSignInButtons";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
+import { Auth } from "aws-amplify";
 
 const SignInScreen = () => {
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
 
   const { control, handleSubmit } = useForm();
 
-  const onSignInPressed = (data) => {
-    console.log(data);
-    navigation.navigate("Home");
+  const onSignInPressed = async (data) => {
+    if(loading){
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await Auth.signIn(data.username, data.password);
+      navigation.navigate("Home");
+      console.log(response);
+    } catch (e) {
+      Alert.alert("Oops", e.message);
+    }
+    setLoading(false);
   };
   const onForgotPasswordPressed = () => {
     navigation.navigate("ForgotPassword");
@@ -48,16 +59,36 @@ const SignInScreen = () => {
           name="username"
           placeholder="Username"
           control={control}
-          rules={{required: 'Username is required',  minLength: {value:3, message: 'Username should be minimum 3 characters long'}, maxLength: {value:8, message: 'Username should be maximum 24 characters long'}}}
+          rules={{
+            required: "Username is required",
+            minLength: {
+              value: 3,
+              message: "Username should be minimum 3 characters long",
+            },
+            maxLength: {
+              value: 24,
+              message: "Username should be maximum 24 characters long",
+            },
+          }}
         />
         <CustomInput
           name="password"
           placeholder="Password"
           control={control}
           secureTextEntry
-          rules={{ required: 'Password is required', minLength:{value:3, message:"Password should be minimum 3 characters long"}, maxLength:{value:8, message:"Password should be maximum 8 characters long"} }} 
+          rules={{
+            required: "Password is required",
+            minLength: {
+              value: 3,
+              message: "Password should be minimum 3 characters long",
+            },
+            maxLength: {
+              value: 8,
+              message: "Password should be maximum 8 characters long",
+            },
+          }}
         />
-        <CustomButton text="Sign in" onPress={handleSubmit(onSignInPressed)} />
+        <CustomButton text={loading ? 'Loading...':"Sign in"} onPress={handleSubmit(onSignInPressed)} />
         <CustomButton
           text="Forgot password?"
           onPress={onForgotPasswordPressed}
