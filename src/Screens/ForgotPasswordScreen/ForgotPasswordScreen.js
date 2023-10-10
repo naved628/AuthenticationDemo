@@ -1,22 +1,34 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
 import React, { useState } from "react";
 
 import CustomInput from "../../Components/CustomInput/CustomInput";
 import CustomButton from "../../Components/CustomButton/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
+import { Auth } from "aws-amplify";
 
 const ForgotPasswordScreen = () => {
-  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-  const {control, handleSubmit}= useForm();
+  const { control, handleSubmit } = useForm();
 
   const onSignInPressed = () => {
     navigation.navigate("SignIn");
   };
 
-  const onSendPressed = () => {
-    navigation.navigate("NewPassword");
+  const onSendPressed = async (data) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await Auth.forgotPassword(data.username);
+      Alert.alert("Sent", "Code has been sent to your mail Id");
+      navigation.navigate("NewPassword", {username:data.username});
+    } catch (e) {
+      Alert.alert("Oops", 'Username is not found');
+    }
+    setLoading(false);
   };
 
   return (
@@ -25,11 +37,24 @@ const ForgotPasswordScreen = () => {
         <Text style={styles.title}>Reset your Password</Text>
         <CustomInput
           placeholder="Username"
-          name='username'
+          name="username"
           control={control}
-          rules={{required: 'Username is required', minLength: {value:3, message:'Username should be 3 characters long'}, maxLength: {value:24, message:'Username should be 24 characters long'}}}
+          rules={{
+            required: "Username is required",
+            minLength: {
+              value: 3,
+              message: "Username should be minimum 3 characters long",
+            },
+            maxLength: {
+              value: 24,
+              message: "Username should be maximum 24 characters long",
+            },
+          }}
         />
-        <CustomButton text="Send" onPress={handleSubmit(onSendPressed)} />
+        <CustomButton
+          text={loading ? "Loading..." : "Send"}
+          onPress={handleSubmit(onSendPressed)}
+        />
         <CustomButton
           text="Back to Sign In"
           onPress={onSignInPressed}
