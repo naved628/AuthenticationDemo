@@ -30,7 +30,7 @@ const SignUpScreen = () => {
         password,
         attributes: { email, name, preferred_username: username },
       });
-      navigation.navigate("ConfirmEmail");
+      navigation.navigate("ConfirmEmail", { username });
     } catch (e) {
       Alert.alert("Oops", e.message);
     }
@@ -103,7 +103,7 @@ const SignUpScreen = () => {
               message: "Password should be minimum 3 characters long",
             },
             maxLength: {
-              value: 8,
+              value: 24,
               message: "Password should be maximum 8 characters long",
             },
           }}
